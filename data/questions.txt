@@ -1,0 +1,5 @@
+1|What is C++?|Programming Language~Database~Operating System~Web Browser|A|C++|Easy
+2|Which feature of C++ allows a class to acquire properties of another class?|Inheritance~Encapsulation~Polymorphism~Abstraction|A|C++|Easy
+3|Which keyword is used to create an object dynamically in C++?|new~create~malloc~object|A|C++|Medium
+4|Which data structure stores elements in a dynamic array?|vector~stack~queue~map|A|C++|Medium
+5|Which concept hides the internal details of a class?|Encapsulation~Inheritance~Compilation~Iteration|A|C++|Easy
