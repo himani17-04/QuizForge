@@ -82,6 +82,39 @@ vector<User> FileManager::loadUsers()
 // Save a question
 void FileManager::saveQuestion(const Question& question)
 {
+    // Check whether the existing file ends with a newline
+    ifstream checkFile(QUESTION_FILE, ios::binary);
+
+    if (checkFile)
+    {
+        checkFile.seekg(0, ios::end);
+
+        streampos fileSize = checkFile.tellg();
+
+        if (fileSize > 0)
+        {
+            checkFile.seekg(-1, ios::end);
+
+            char lastCharacter;
+            checkFile.get(lastCharacter);
+
+            checkFile.close();
+
+            // Add a newline if the file does not already have one
+            if (lastCharacter != '\n')
+            {
+                ofstream newLineFile(QUESTION_FILE, ios::app);
+                newLineFile << "\n";
+                newLineFile.close();
+            }
+        }
+        else
+        {
+            checkFile.close();
+        }
+    }
+
+    // Open file in append mode
     ofstream file(QUESTION_FILE, ios::app);
 
     if (!file)
@@ -100,13 +133,16 @@ void FileManager::saveQuestion(const Question& question)
         file << options[i];
 
         if (i < options.size() - 1)
+        {
             file << "~";
+        }
     }
 
     file << "|"
          << question.getCorrectAnswer() << "|"
          << question.getCategory() << "|"
-         << question.getDifficulty() << "\n";
+         << question.getDifficulty()
+         << "\n";
 
     file.close();
 }

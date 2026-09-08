@@ -1,6 +1,10 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <fstream>
+#include <sstream>
+#include <algorithm>
+#include <random>
 
 #include "../include/User.h"
 #include "../include/Question.h"
@@ -105,10 +109,207 @@ void startStudentQuiz(const User& user)
     cout << "              START QUIZ\n";
     cout << "========================================\n";
 
+    // Select category
+    int categoryChoice;
+
+    cout << "\nSelect Category:\n";
+    cout << "1. C++\n";
+    cout << "2. Java\n";
+    cout << "3. Python\n";
+    cout << "4. General Knowledge\n";
+
+    cout << "\nEnter your choice: ";
+    cin >> categoryChoice;
+
     string category;
+
+    switch (categoryChoice)
+    {
+        case 1:
+            category = "C++";
+            break;
+
+        case 2:
+            category = "Java";
+            break;
+
+        case 3:
+            category = "Python";
+            break;
+
+        case 4:
+            category = "General Knowledge";
+            break;
+
+        default:
+            cout << "\nInvalid category choice.\n";
+            return;
+    }
+
+    // Select difficulty
+    int difficultyChoice;
+
+    cout << "\nSelect Difficulty:\n";
+    cout << "1. Easy\n";
+    cout << "2. Medium\n";
+    cout << "3. Hard\n";
+
+    cout << "\nEnter your choice: ";
+    cin >> difficultyChoice;
+
     string difficulty;
 
-    cout << "\nAvailable Categories:\n";
+    switch (difficultyChoice)
+    {
+        case 1:
+            difficulty = "Easy";
+            break;
+
+        case 2:
+            difficulty = "Medium";
+            break;
+
+        case 3:
+            difficulty = "Hard";
+            break;
+
+        default:
+            cout << "\nInvalid difficulty choice.\n";
+            return;
+    }
+
+    // Load all questions
+    vector<Question> allQuestions =
+        FileManager::loadQuestions();
+
+    // Filter questions
+    vector<Question> availableQuestions;
+
+    for (const Question& question : allQuestions)
+    {
+        if (question.getCategory() == category &&
+            question.getDifficulty() == difficulty)
+        {
+            availableQuestions.push_back(question);
+        }
+    }
+
+    // Check whether questions are available
+    if (availableQuestions.empty())
+    {
+        cout << "\nNo questions available for:\n";
+        cout << "Category   : " << category << "\n";
+        cout << "Difficulty : " << difficulty << "\n";
+        return;
+    }
+
+    cout << "\nQuestions available: "
+         << availableQuestions.size() << "\n";
+
+    // Ask number of questions
+    int numberOfQuestions;
+
+    cout << "\nHow many questions would you like to attempt? ";
+    cin >> numberOfQuestions;
+
+    // Validate question count
+    while (numberOfQuestions < 1 ||
+           numberOfQuestions > static_cast<int>(availableQuestions.size()))
+    {
+        cout << "Please enter a number between 1 and "
+             << availableQuestions.size() << ": ";
+
+        cin >> numberOfQuestions;
+    }
+
+    // Randomly shuffle questions
+    random_device rd;
+    mt19937 generator(rd());
+
+    shuffle(
+        availableQuestions.begin(),
+        availableQuestions.end(),
+        generator
+    );
+
+    // Select required number of questions
+    vector<Question> selectedQuestions(
+        availableQuestions.begin(),
+        availableQuestions.begin() + numberOfQuestions
+    );
+
+    // Create quiz
+    Quiz quiz(
+        selectedQuestions,
+        category,
+        difficulty
+    );
+
+    // Start quiz
+    quiz.startQuiz();
+
+    // Save result
+    FileManager::saveResult(
+        user.getUsername(),
+        category,
+        quiz.getTotalQuestions(),
+        quiz.getCorrectAnswers(),
+        quiz.getWrongAnswers(),
+        quiz.calculatePercentage()
+    );
+}
+
+// Admin - Add Question
+void addQuestion()
+{
+    cout << "\n========================================\n";
+    cout << "             ADD QUESTION\n";
+    cout << "========================================\n";
+
+    string questionText;
+    string optionA;
+    string optionB;
+    string optionC;
+    string optionD;
+    string category;
+    string difficulty;
+    char correctAnswer;
+
+    // Get question details
+    cout << "\nEnter question: ";
+    getline(cin >> ws, questionText);
+
+    cout << "Enter Option A: ";
+    getline(cin >> ws, optionA);
+
+    cout << "Enter Option B: ";
+    getline(cin >> ws, optionB);
+
+    cout << "Enter Option C: ";
+    getline(cin >> ws, optionC);
+
+    cout << "Enter Option D: ";
+    getline(cin >> ws, optionD);
+
+    // Get correct answer
+    cout << "\nEnter correct answer (A/B/C/D): ";
+    cin >> correctAnswer;
+
+    correctAnswer = toupper(correctAnswer);
+
+    while (correctAnswer != 'A' &&
+           correctAnswer != 'B' &&
+           correctAnswer != 'C' &&
+           correctAnswer != 'D')
+    {
+        cout << "Invalid answer. Enter A, B, C or D: ";
+        cin >> correctAnswer;
+
+        correctAnswer = toupper(correctAnswer);
+    }
+
+    // Select category
+    cout << "\nSelect category:\n";
     cout << "1. C++\n";
     cout << "2. Java\n";
     cout << "3. Python\n";
@@ -116,7 +317,7 @@ void startStudentQuiz(const User& user)
 
     int categoryChoice;
 
-    cout << "\nSelect category: ";
+    cout << "Enter category: ";
     cin >> categoryChoice;
 
     switch (categoryChoice)
@@ -142,14 +343,15 @@ void startStudentQuiz(const User& user)
             return;
     }
 
-    cout << "\nAvailable Difficulties:\n";
+    // Select difficulty
+    cout << "\nSelect difficulty:\n";
     cout << "1. Easy\n";
     cout << "2. Medium\n";
     cout << "3. Hard\n";
 
     int difficultyChoice;
 
-    cout << "\nSelect difficulty: ";
+    cout << "Enter difficulty: ";
     cin >> difficultyChoice;
 
     switch (difficultyChoice)
@@ -171,53 +373,262 @@ void startStudentQuiz(const User& user)
             return;
     }
 
-    // Load all questions from file
-    vector<Question> allQuestions =
+    // Load existing questions
+    vector<Question> questions =
         FileManager::loadQuestions();
 
-    // Store matching questions
-    vector<Question> quizQuestions;
+    // Generate new question ID
+    int newQuestionId = 1;
 
-    for (const Question& question : allQuestions)
+    for (const Question& question : questions)
     {
-        if (question.getCategory() == category &&
-            question.getDifficulty() == difficulty)
+        if (question.getQuestionId() >= newQuestionId)
         {
-            quizQuestions.push_back(question);
+            newQuestionId =
+                question.getQuestionId() + 1;
         }
     }
 
-    if (quizQuestions.empty())
+    // Create options vector
+    vector<string> options =
     {
-        cout << "\nNo questions available for this category "
-             << "and difficulty.\n";
-        return;
-    }
+        optionA,
+        optionB,
+        optionC,
+        optionD
+    };
 
-    cout << "\nQuestions found: "
-         << quizQuestions.size() << "\n";
-
-    // Create quiz
-    Quiz quiz(
-        quizQuestions,
+    // Create Question object
+    Question newQuestion(
+        newQuestionId,
+        questionText,
+        options,
+        correctAnswer,
         category,
         difficulty
     );
 
-    // Start quiz
-    quiz.startQuiz();
+    // Save question
+    FileManager::saveQuestion(newQuestion);
 
-    // Save result
-    FileManager::saveResult(
-        user.getUsername(),
-        category,
-        quiz.getTotalQuestions(),
-        quiz.getCorrectAnswers(),
-        quiz.getWrongAnswers(),
-        quiz.calculatePercentage()
-    );
+    cout << "\n========================================\n";
+    cout << "       QUESTION ADDED SUCCESSFULLY\n";
+    cout << "========================================\n";
 
-    cout << "\nYour result has been saved successfully.\n";
+    cout << "Question ID : "
+         << newQuestionId << "\n";
+
+    cout << "Category    : "
+         << category << "\n";
+
+    cout << "Difficulty  : "
+         << difficulty << "\n";
+
+    cout << "========================================\n";
+}
+
+// Admin - Update Question
+void updateQuestion()
+{
+    cout << "\n========================================\n";
+    cout << "            UPDATE QUESTION\n";
+    cout << "========================================\n";
+
+    vector<Question> questions =
+        FileManager::loadQuestions();
+
+    if (questions.empty())
+    {
+        cout << "\nNo questions available.\n";
+        return;
+    }
+
+    int questionId;
+
+    cout << "\nEnter Question ID to update: ";
+    cin >> questionId;
+
+    bool found = false;
+
+    for (Question& question : questions)
+    {
+        if (question.getQuestionId() == questionId)
+        {
+            found = true;
+
+            cout << "\nCurrent Question:\n";
+            question.displayQuestion();
+
+            string questionText;
+            string optionA;
+            string optionB;
+            string optionC;
+            string optionD;
+            string category;
+            string difficulty;
+            char correctAnswer;
+
+            cout << "\nEnter new question: ";
+            getline(cin >> ws, questionText);
+
+            cout << "Enter new Option A: ";
+            getline(cin >> ws, optionA);
+
+            cout << "Enter new Option B: ";
+            getline(cin >> ws, optionB);
+
+            cout << "Enter new Option C: ";
+            getline(cin >> ws, optionC);
+
+            cout << "Enter new Option D: ";
+            getline(cin >> ws, optionD);
+
+            cout << "\nEnter new correct answer (A/B/C/D): ";
+            cin >> correctAnswer;
+
+            correctAnswer = toupper(correctAnswer);
+
+            while (correctAnswer != 'A' &&
+                   correctAnswer != 'B' &&
+                   correctAnswer != 'C' &&
+                   correctAnswer != 'D')
+            {
+                cout << "Invalid answer. Enter A, B, C or D: ";
+                cin >> correctAnswer;
+
+                correctAnswer = toupper(correctAnswer);
+            }
+
+            cout << "\nSelect new category:\n";
+            cout << "1. C++\n";
+            cout << "2. Java\n";
+            cout << "3. Python\n";
+            cout << "4. General Knowledge\n";
+
+            int categoryChoice;
+
+            cout << "Enter category: ";
+            cin >> categoryChoice;
+
+            switch (categoryChoice)
+            {
+                case 1:
+                    category = "C++";
+                    break;
+
+                case 2:
+                    category = "Java";
+                    break;
+
+                case 3:
+                    category = "Python";
+                    break;
+
+                case 4:
+                    category = "General Knowledge";
+                    break;
+
+                default:
+                    cout << "\nInvalid category.\n";
+                    return;
+            }
+
+            cout << "\nSelect new difficulty:\n";
+            cout << "1. Easy\n";
+            cout << "2. Medium\n";
+            cout << "3. Hard\n";
+
+            int difficultyChoice;
+
+            cout << "Enter difficulty: ";
+            cin >> difficultyChoice;
+
+            switch (difficultyChoice)
+            {
+                case 1:
+                    difficulty = "Easy";
+                    break;
+
+                case 2:
+                    difficulty = "Medium";
+                    break;
+
+                case 3:
+                    difficulty = "Hard";
+                    break;
+
+                default:
+                    cout << "\nInvalid difficulty.\n";
+                    return;
+            }
+
+            vector<string> options =
+            {
+                optionA,
+                optionB,
+                optionC,
+                optionD
+            };
+
+            // Update the question
+            question.setQuestionText(questionText);
+            question.setOptions(options);
+            question.setCorrectAnswer(correctAnswer);
+            question.setCategory(category);
+            question.setDifficulty(difficulty);
+
+            break;
+        }
+    }
+
+    if (!found)
+    {
+        cout << "\nQuestion with ID "
+             << questionId
+             << " was not found.\n";
+
+        return;
+    }
+
+    // Rewrite the complete questions file
+    ofstream file("data/questions.txt");
+
+    if (!file)
+    {
+        cout << "\nError: Unable to update questions file.\n";
+        return;
+    }
+
+    for (const Question& question : questions)
+    {
+        vector<string> options =
+            question.getOptions();
+
+        file << question.getQuestionId() << "|"
+             << question.getQuestionText() << "|";
+
+        for (size_t i = 0; i < options.size(); i++)
+        {
+            file << options[i];
+
+            if (i < options.size() - 1)
+            {
+                file << "~";
+            }
+        }
+
+        file << "|"
+             << question.getCorrectAnswer() << "|"
+             << question.getCategory() << "|"
+             << question.getDifficulty()
+             << "\n";
+    }
+
+    file.close();
+
+    cout << "\n========================================\n";
+    cout << "       QUESTION UPDATED SUCCESSFULLY\n";
+    cout << "========================================\n";
 }
 
 // Student dashboard
@@ -293,6 +704,111 @@ bool loginAdmin()
     return false;
 }
 
+// Admin - Delete Question
+void deleteQuestion()
+{
+    cout << "\n========================================\n";
+    cout << "            DELETE QUESTION\n";
+    cout << "========================================\n";
+
+    vector<Question> questions =
+        FileManager::loadQuestions();
+
+    if (questions.empty())
+    {
+        cout << "\nNo questions available.\n";
+        return;
+    }
+
+    int questionId;
+
+    cout << "\nEnter Question ID to delete: ";
+    cin >> questionId;
+
+    bool found = false;
+
+    for (auto it = questions.begin();
+         it != questions.end();
+         ++it)
+    {
+        if (it->getQuestionId() == questionId)
+        {
+            found = true;
+
+            cout << "\nQuestion found:\n";
+            it->displayQuestion();
+
+            char confirmation;
+
+            cout << "\nAre you sure you want to delete "
+                 << "this question? (Y/N): ";
+            cin >> confirmation;
+
+            confirmation = toupper(confirmation);
+
+            if (confirmation != 'Y')
+            {
+                cout << "\nDelete operation cancelled.\n";
+                return;
+            }
+
+            // Remove question from vector
+            questions.erase(it);
+
+            break;
+        }
+    }
+
+    if (!found)
+    {
+        cout << "\nQuestion with ID "
+             << questionId
+             << " was not found.\n";
+
+        return;
+    }
+
+    // Rewrite questions.txt without deleted question
+    ofstream file("data/questions.txt");
+
+    if (!file)
+    {
+        cout << "\nError: Unable to update questions file.\n";
+        return;
+    }
+
+    for (const Question& question : questions)
+    {
+        vector<string> options =
+            question.getOptions();
+
+        file << question.getQuestionId() << "|"
+             << question.getQuestionText() << "|";
+
+        for (size_t i = 0; i < options.size(); i++)
+        {
+            file << options[i];
+
+            if (i < options.size() - 1)
+            {
+                file << "~";
+            }
+        }
+
+        file << "|"
+             << question.getCorrectAnswer() << "|"
+             << question.getCategory() << "|"
+             << question.getDifficulty()
+             << "\n";
+    }
+
+    file.close();
+
+    cout << "\n========================================\n";
+    cout << "       QUESTION DELETED SUCCESSFULLY\n";
+    cout << "========================================\n";
+}
+
 void adminDashboard()
 {
     int choice;
@@ -316,24 +832,116 @@ void adminDashboard()
         switch (choice)
         {
             case 1:
-                cout << "\nAdd Question module will be connected here.\n";
+                addQuestion();
                 break;
 
             case 2:
-                cout << "\nView Questions module will be connected here.\n";
+            {
+                vector<Question> questions =
+                FileManager::loadQuestions();
+
+                cout << "\n========================================\n";
+                cout << "            ALL QUESTIONS\n";
+                cout << "========================================\n";
+
+                if (questions.empty())
+                {
+                    cout << "\nNo questions available.\n";
+                    break;
+                }
+
+                for (const Question& question : questions)
+                {
+                    cout << "\nQuestion ID : "<< question.getQuestionId() << "\n";
+
+                    cout << "Question    : "<< question.getQuestionText() << "\n";
+
+                    vector<string> options = question.getOptions();
+
+                    for (size_t i = 0; i < options.size(); i++)
+                    {
+                        cout << char('A' + i)<< ". " << options[i] << "\n";
+                    }
+
+                    cout << "Correct     : "<< question.getCorrectAnswer() << "\n";
+
+                    cout << "Category    : "<< question.getCategory() << "\n";
+
+                    cout << "Difficulty  : "<< question.getDifficulty() << "\n";
+
+                    cout << "----------------------------------------\n";
+                }
                 break;
+            }
 
             case 3:
-                cout << "\nUpdate Question module will be connected here.\n";
+                updateQuestion();
                 break;
 
             case 4:
-                cout << "\nDelete Question module will be connected here.\n";
+                deleteQuestion();
                 break;
 
             case 5:
-                cout << "\nView Results module will be connected here.\n";
-                break;
+{
+    cout << "\n========================================\n";
+    cout << "          STUDENT RESULTS\n";
+    cout << "========================================\n";
+
+    ifstream file("data/results.txt");
+
+    if (!file)
+    {
+        cout << "\nNo student results available.\n";
+        break;
+    }
+
+    string line;
+    bool hasResults = false;
+
+    cout << "\nUsername\tCategory\tTotal\tCorrect\tWrong\tPercentage\n";
+    cout << "------------------------------------------------------------------\n";
+
+    while (getline(file, line))
+    {
+        if (line.empty())
+            continue;
+
+        hasResults = true;
+
+        string username;
+        string category;
+        string totalQuestions;
+        string correctAnswers;
+        string wrongAnswers;
+        string percentage;
+
+        stringstream ss(line);
+
+        getline(ss, username, '|');
+        getline(ss, category, '|');
+        getline(ss, totalQuestions, '|');
+        getline(ss, correctAnswers, '|');
+        getline(ss, wrongAnswers, '|');
+        getline(ss, percentage, '|');
+
+        cout << username << "\t\t"
+             << category << "\t"
+             << totalQuestions << "\t"
+             << correctAnswers << "\t"
+             << wrongAnswers << "\t"
+             << percentage << "%\n";
+    }
+
+    file.close();
+
+    if (!hasResults)
+    {
+        cout << "\nNo student results available.\n";
+    }
+
+    break;
+}
 
             case 6:
                 cout << "\nLogging out from admin account...\n";
