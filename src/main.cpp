@@ -354,14 +354,29 @@ void startStudentQuiz(const User& user)
 
     // ==================== SAVE RESULT ====================
 
+    // Determine pass/fail result
+    string result;
+
+    if (quiz.calculatePercentage() >= 40)
+    {
+        result = "PASSED";
+    }
+    else
+    {
+        result = "FAILED";
+    }
+
+    // Save result
     FileManager::saveResult(
-        user.getUsername(),
-        category,
-        quiz.getTotalQuestions(),
-        quiz.getCorrectAnswers(),
-        quiz.getWrongAnswers(),
-        quiz.calculatePercentage()
-    );
+    user.getUsername(),
+    category,
+    difficulty,
+    quiz.getTotalQuestions(),
+    quiz.getCorrectAnswers(),
+    quiz.getWrongAnswers(),
+    quiz.calculatePercentage(),
+    result
+);
 }
 
 // Admin - Add Question
@@ -1030,65 +1045,65 @@ void adminDashboard()
                 break;
 
             case 5:
-{
-    cout << "\n========================================\n";
-    cout << "          STUDENT RESULTS\n";
-    cout << "========================================\n";
+            {
+                cout << "\n========================================\n";
+                cout << "          STUDENT RESULTS\n";
+                cout << "========================================\n";
 
-    ifstream file("data/results.txt");
+                ifstream file("data/results.txt");
 
-    if (!file)
-    {
-        cout << "\nNo student results available.\n";
-        break;
-    }
+                if (!file)
+                {
+                    cout << "\nNo student results available.\n";
+                    break;
+                }
 
-    string line;
-    bool hasResults = false;
+                string line;
+                bool hasResults = false;
 
-    cout << "\nUsername\tCategory\tTotal\tCorrect\tWrong\tPercentage\n";
-    cout << "------------------------------------------------------------------\n";
+                cout << "\nUsername\tCategory\tTotal\tCorrect\tWrong\tPercentage\n";
+                cout << "------------------------------------------------------------------\n";
 
-    while (getline(file, line))
-    {
-        if (line.empty())
-            continue;
+                while (getline(file, line))
+                {
+                    if (line.empty())
+                    continue;
 
-        hasResults = true;
+                    hasResults = true;
 
-        string username;
-        string category;
-        string totalQuestions;
-        string correctAnswers;
-        string wrongAnswers;
-        string percentage;
+                    string username;
+                    string category;
+                    string totalQuestions;
+                    string correctAnswers;
+                    string wrongAnswers;
+                    string percentage;
 
-        stringstream ss(line);
+                    stringstream ss(line);
 
-        getline(ss, username, '|');
-        getline(ss, category, '|');
-        getline(ss, totalQuestions, '|');
-        getline(ss, correctAnswers, '|');
-        getline(ss, wrongAnswers, '|');
-        getline(ss, percentage, '|');
+                    getline(ss, username, '|');
+                    getline(ss, category, '|');
+                    getline(ss, totalQuestions, '|');
+                    getline(ss, correctAnswers, '|');
+                    getline(ss, wrongAnswers, '|');
+                    getline(ss, percentage, '|');
 
-        cout << username << "\t\t"
-             << category << "\t"
-             << totalQuestions << "\t"
-             << correctAnswers << "\t"
-             << wrongAnswers << "\t"
-             << percentage << "%\n";
-    }
+                    cout << username << "\t\t"
+                        << category << "\t"
+                        << totalQuestions << "\t"
+                        << correctAnswers << "\t"
+                        << wrongAnswers << "\t"
+                        << percentage << "%\n";
+                }
 
-    file.close();
+                file.close();
 
-    if (!hasResults)
-    {
-        cout << "\nNo student results available.\n";
-    }
+                if (!hasResults)
+                {
+                    cout << "\nNo student results available.\n";
+                }
 
-    break;
-}
+                break;
+            }
 
             case 6:
                 cout << "\nLogging out from admin account...\n";

@@ -21,11 +21,13 @@ public:
 
     // Result file operations
     static void saveResult(string username,
-                           string category,
-                           int totalQuestions,
-                           int correctAnswers,
-                           int wrongAnswers,
-                           double percentage);
+                       string category,
+                       string difficulty,
+                       int totalQuestions,
+                       int correctAnswers,
+                       int wrongAnswers,
+                       double percentage,
+                       string result);
 
     // Check whether a username already exists
     static bool usernameExists(string username);

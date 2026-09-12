@@ -215,10 +215,12 @@ vector<Question> FileManager::loadQuestions()
 void FileManager::saveResult(
     string username,
     string category,
+    string difficulty,
     int totalQuestions,
     int correctAnswers,
     int wrongAnswers,
-    double percentage)
+    double percentage,
+    string result)
 {
     ofstream file(RESULT_FILE, ios::app);
 
@@ -230,10 +232,13 @@ void FileManager::saveResult(
 
     file << username << "|"
          << category << "|"
+         << difficulty << "|"
          << totalQuestions << "|"
          << correctAnswers << "|"
          << wrongAnswers << "|"
-         << percentage << "\n";
+         << percentage << "|"
+         << result
+         << "\n";
 
     file.close();
 }

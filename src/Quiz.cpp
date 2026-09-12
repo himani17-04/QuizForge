@@ -116,14 +116,20 @@ void Quiz::startQuiz()
         answer = toupper(answer);
 
         while (answer != 'A' &&
-               answer != 'B' &&
-               answer != 'C' &&
-               answer != 'D')
+        answer != 'B' &&
+        answer != 'C' &&
+        answer != 'D')
         {
-            cout << "Invalid answer. Please enter A, B, C or D: ";
+            cout << "\nInvalid answer.\n";
+            cout << "Please enter only A, B, C or D: ";
+
+            cin.clear();
+            cin.ignore(10000, '\n');
+
             cin >> answer;
-            answer = toupper(answer);
-        }
+
+        answer = toupper(answer);
+    }
 
         if (questions[i].checkAnswer(answer))
         {
