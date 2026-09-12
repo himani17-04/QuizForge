@@ -24,11 +24,35 @@ void registerStudent()
     string username;
     string password;
 
+    // Full name validation
     cout << "Enter full name: ";
     getline(cin >> ws, fullName);
 
+    while (fullName.empty())
+    {
+        cout << "Full name cannot be empty.\n";
+        cout << "Enter full name: ";
+        getline(cin >> ws, fullName);
+    }
+
+    // Username validation
     cout << "Enter username: ";
-    cin >> username;
+    getline(cin >> ws, username);
+
+    while (username.empty())
+    {
+        cout << "Username cannot be empty.\n";
+        cout << "Enter username: ";
+        getline(cin >> ws, username);
+    }
+
+    // Check whether username contains spaces
+    if (username.find(' ') != string::npos)
+    {
+        cout << "\nUsername cannot contain spaces.\n";
+        cout << "Registration cancelled.\n";
+        return;
+    }
 
     // Check whether username already exists
     if (FileManager::usernameExists(username))
@@ -38,8 +62,16 @@ void registerStudent()
         return;
     }
 
+    // Password validation
     cout << "Enter password: ";
     cin >> password;
+
+    if (password.length() < 6)
+    {
+        cout << "\nPassword must contain at least 6 characters.\n";
+        cout << "Registration cancelled.\n";
+        return;
+    }
 
     // Generate user ID
     vector<User> users = FileManager::loadUsers();
@@ -60,8 +92,13 @@ void registerStudent()
 
     FileManager::saveUser(newUser);
 
-    cout << "\nRegistration successful!\n";
-    cout << "Your User ID is: " << newUserId << "\n";
+    cout << "\n========================================\n";
+    cout << "       REGISTRATION SUCCESSFUL\n";
+    cout << "========================================\n";
+    cout << "Name     : " << fullName << "\n";
+    cout << "Username : " << username << "\n";
+    cout << "User ID  : " << newUserId << "\n";
+    cout << "========================================\n";
 }
 
 // Student login
@@ -74,14 +111,32 @@ bool loginStudent(User& loggedInUser)
     string username;
     string password;
 
+    // Username validation
     cout << "Enter username: ";
-    cin >> username;
+    getline(cin >> ws, username);
 
+    while (username.empty())
+    {
+        cout << "Username cannot be empty.\n";
+        cout << "Enter username: ";
+        getline(cin >> ws, username);
+    }
+
+    // Password validation
     cout << "Enter password: ";
-    cin >> password;
+    getline(cin >> ws, password);
 
+    while (password.empty())
+    {
+        cout << "Password cannot be empty.\n";
+        cout << "Enter password: ";
+        getline(cin >> ws, password);
+    }
+
+    // Load registered users
     vector<User> users = FileManager::loadUsers();
 
+    // Validate login
     for (const User& user : users)
     {
         if (user.getUsername() == username &&
@@ -89,7 +144,9 @@ bool loginStudent(User& loggedInUser)
         {
             loggedInUser = user;
 
-            cout << "\nLogin successful!\n";
+            cout << "\n========================================\n";
+            cout << "           LOGIN SUCCESSFUL\n";
+            cout << "========================================\n";
             cout << "Welcome, "
                  << user.getFullName()
                  << "!\n";
@@ -98,7 +155,10 @@ bool loginStudent(User& loggedInUser)
         }
     }
 
-    cout << "\nInvalid username or password.\n";
+    cout << "\n========================================\n";
+    cout << "       INVALID LOGIN DETAILS\n";
+    cout << "========================================\n";
+    cout << "Invalid username or password.\n";
 
     return false;
 }
@@ -971,7 +1031,16 @@ int main()
         cout << "4. Exit\n";
 
         cout << "\nEnter your choice: ";
-        cin >> choice;
+
+        // Validate menu input
+        while (!(cin >> choice))
+        {
+            cout << "\nInvalid input. Please enter a number.\n";
+            cout << "Enter your choice: ";
+
+            cin.clear();
+            cin.ignore(10000, '\n');
+        }
 
         switch (choice)
         {
@@ -1006,7 +1075,7 @@ int main()
                 break;
 
             default:
-                cout << "\nInvalid choice. Please try again.\n";
+                cout << "\nInvalid choice. Please enter a number between 1 and 4.\n";
         }
 
     } while (choice != 4);
