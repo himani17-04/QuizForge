@@ -743,11 +743,27 @@ bool loginAdmin()
     string username;
     string password;
 
+    // Username validation
     cout << "Enter admin username: ";
-    cin >> username;
+    getline(cin >> ws, username);
 
+    while (username.empty())
+    {
+        cout << "Admin username cannot be empty.\n";
+        cout << "Enter admin username: ";
+        getline(cin >> ws, username);
+    }
+
+    // Password validation
     cout << "Enter admin password: ";
-    cin >> password;
+    getline(cin >> ws, password);
+
+    while (password.empty())
+    {
+        cout << "Admin password cannot be empty.\n";
+        cout << "Enter admin password: ";
+        getline(cin >> ws, password);
+    }
 
     // Default admin credentials
     const string ADMIN_USERNAME = "admin";
@@ -756,11 +772,18 @@ bool loginAdmin()
     if (username == ADMIN_USERNAME &&
         password == ADMIN_PASSWORD)
     {
-        cout << "\nAdmin login successful!\n";
+        cout << "\n========================================\n";
+        cout << "        ADMIN LOGIN SUCCESSFUL\n";
+        cout << "========================================\n";
+
         return true;
     }
 
-    cout << "\nInvalid admin username or password.\n";
+    cout << "\n========================================\n";
+    cout << "       INVALID ADMIN CREDENTIALS\n";
+    cout << "========================================\n";
+    cout << "Invalid admin username or password.\n";
+
     return false;
 }
 
