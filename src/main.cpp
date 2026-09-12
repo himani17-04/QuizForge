@@ -163,13 +163,15 @@ bool loginStudent(User& loggedInUser)
     return false;
 }
 
+// Start student quiz
 void startStudentQuiz(const User& user)
 {
     cout << "\n========================================\n";
     cout << "              START QUIZ\n";
     cout << "========================================\n";
 
-    // Select category
+    // ==================== CATEGORY ====================
+
     int categoryChoice;
 
     cout << "\nSelect Category:\n";
@@ -179,7 +181,16 @@ void startStudentQuiz(const User& user)
     cout << "4. General Knowledge\n";
 
     cout << "\nEnter your choice: ";
-    cin >> categoryChoice;
+
+    while (!(cin >> categoryChoice))
+    {
+        cout << "\nInvalid input. Please enter a number.\n";
+
+        cin.clear();
+        cin.ignore(10000, '\n');
+
+        cout << "Enter your choice: ";
+    }
 
     string category;
 
@@ -206,7 +217,8 @@ void startStudentQuiz(const User& user)
             return;
     }
 
-    // Select difficulty
+    // ==================== DIFFICULTY ====================
+
     int difficultyChoice;
 
     cout << "\nSelect Difficulty:\n";
@@ -215,7 +227,16 @@ void startStudentQuiz(const User& user)
     cout << "3. Hard\n";
 
     cout << "\nEnter your choice: ";
-    cin >> difficultyChoice;
+
+    while (!(cin >> difficultyChoice))
+    {
+        cout << "\nInvalid input. Please enter a number.\n";
+
+        cin.clear();
+        cin.ignore(10000, '\n');
+
+        cout << "Enter your choice: ";
+    }
 
     string difficulty;
 
@@ -238,11 +259,12 @@ void startStudentQuiz(const User& user)
             return;
     }
 
-    // Load all questions
+    // ==================== LOAD QUESTIONS ====================
+
     vector<Question> allQuestions =
         FileManager::loadQuestions();
 
-    // Filter questions
+    // Filter questions according to category and difficulty
     vector<Question> availableQuestions;
 
     for (const Question& question : allQuestions)
@@ -266,23 +288,44 @@ void startStudentQuiz(const User& user)
     cout << "\nQuestions available: "
          << availableQuestions.size() << "\n";
 
-    // Ask number of questions
+    // ==================== QUESTION COUNT ====================
+
     int numberOfQuestions;
 
     cout << "\nHow many questions would you like to attempt? ";
-    cin >> numberOfQuestions;
+
+    while (!(cin >> numberOfQuestions))
+    {
+        cout << "\nInvalid input. Please enter a number.\n";
+
+        cin.clear();
+        cin.ignore(10000, '\n');
+
+        cout << "How many questions would you like to attempt? ";
+    }
 
     // Validate question count
     while (numberOfQuestions < 1 ||
-           numberOfQuestions > static_cast<int>(availableQuestions.size()))
+           numberOfQuestions >
+           static_cast<int>(availableQuestions.size()))
     {
         cout << "Please enter a number between 1 and "
              << availableQuestions.size() << ": ";
 
-        cin >> numberOfQuestions;
+        while (!(cin >> numberOfQuestions))
+        {
+            cout << "\nInvalid input. Please enter a number.\n";
+
+            cin.clear();
+            cin.ignore(10000, '\n');
+
+            cout << "Please enter a number between 1 and "
+                 << availableQuestions.size() << ": ";
+        }
     }
 
-    // Randomly shuffle questions
+    // ==================== RANDOM QUESTIONS ====================
+
     random_device rd;
     mt19937 generator(rd());
 
@@ -298,7 +341,8 @@ void startStudentQuiz(const User& user)
         availableQuestions.begin() + numberOfQuestions
     );
 
-    // Create quiz
+    // ==================== CREATE QUIZ ====================
+
     Quiz quiz(
         selectedQuestions,
         category,
@@ -308,7 +352,8 @@ void startStudentQuiz(const User& user)
     // Start quiz
     quiz.startQuiz();
 
-    // Save result
+    // ==================== SAVE RESULT ====================
+
     FileManager::saveResult(
         user.getUsername(),
         category,
@@ -711,7 +756,17 @@ void studentDashboard(const User& user)
         cout << "3. Logout\n";
 
         cout << "\nEnter your choice: ";
-        cin >> choice;
+
+        // Validate menu input
+        while (!(cin >> choice))
+        {
+            cout << "\nInvalid input. Please enter a number.\n";
+
+            cin.clear();
+            cin.ignore(10000, '\n');
+
+            cout << "Enter your choice: ";
+        }
 
         switch (choice)
         {
@@ -728,7 +783,7 @@ void studentDashboard(const User& user)
                 break;
 
             default:
-                cout << "\nInvalid choice. Please try again.\n";
+                cout << "\nInvalid choice. Please enter a number between 1 and 3.\n";
         }
 
     } while (choice != 3);
@@ -910,7 +965,16 @@ void adminDashboard()
         cout << "6. Logout\n";
 
         cout << "\nEnter your choice: ";
-        cin >> choice;
+
+        while (!(cin >> choice))
+        {
+            cout << "\nInvalid input. Please enter a number.\n";
+
+            cin.clear();
+            cin.ignore(10000, '\n');
+
+            cout << "Enter your choice: ";
+    }
 
         switch (choice)
         {
