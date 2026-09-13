@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+
 #include "Question.h"
 
 using namespace std;
@@ -18,6 +19,9 @@ private:
     int correctAnswers;
     int wrongAnswers;
 
+    // Quiz time limit in seconds
+    int timeLimit;
+
 public:
     // Default constructor
     Quiz();
@@ -31,6 +35,7 @@ public:
     void setQuestions(vector<Question> questionList);
     void setCategory(string quizCategory);
     void setDifficulty(string quizDifficulty);
+    void setTimeLimit(int seconds);
 
     // Getters
     vector<Question> getQuestions() const;
@@ -40,6 +45,7 @@ public:
     int getTotalQuestions() const;
     int getCorrectAnswers() const;
     int getWrongAnswers() const;
+    int getTimeLimit() const;
 
     // Quiz operations
     void startQuiz();

@@ -1061,8 +1061,8 @@ void adminDashboard()
                 string line;
                 bool hasResults = false;
 
-                cout << "\nUsername\tCategory\tTotal\tCorrect\tWrong\tPercentage\n";
-                cout << "------------------------------------------------------------------\n";
+                cout << "\nUsername\tCategory\tDifficulty\tTotal\tCorrect\tWrong\tPercentage\tResult\n";
+                cout << "------------------------------------------------------------------------------------------\n";
 
                 while (getline(file, line))
                 {
@@ -1073,26 +1073,32 @@ void adminDashboard()
 
                     string username;
                     string category;
+                    string difficulty;
                     string totalQuestions;
                     string correctAnswers;
                     string wrongAnswers;
                     string percentage;
+                    string result;
 
                     stringstream ss(line);
 
                     getline(ss, username, '|');
                     getline(ss, category, '|');
+                    getline(ss, difficulty, '|');
                     getline(ss, totalQuestions, '|');
                     getline(ss, correctAnswers, '|');
                     getline(ss, wrongAnswers, '|');
                     getline(ss, percentage, '|');
+                    getline(ss, result, '|');
 
                     cout << username << "\t\t"
-                        << category << "\t"
+                        << category << "\t\t"
+                        << difficulty << "\t"
                         << totalQuestions << "\t"
                         << correctAnswers << "\t"
                         << wrongAnswers << "\t"
-                        << percentage << "%\n";
+                        << percentage << "%\t\t"
+                        << result << "\n";
                 }
 
                 file.close();

@@ -2,6 +2,7 @@
 #include <iostream>
 #include <iomanip>
 #include <cctype>
+#include <chrono>
 
 using namespace std;
 
@@ -13,6 +14,9 @@ Quiz::Quiz()
     totalQuestions = 0;
     correctAnswers = 0;
     wrongAnswers = 0;
+
+    // Default time limit: 60 seconds (1 minute)
+    timeLimit = 60;
 }
 
 // Parameterized constructor
@@ -27,9 +31,12 @@ Quiz::Quiz(vector<Question> questionList,
     totalQuestions = questions.size();
     correctAnswers = 0;
     wrongAnswers = 0;
+
+    // Default time limit: 60 seconds (1 minute)
+    timeLimit = 60;
 }
 
-// Setters
+// ==================== SETTERS ====================
 
 void Quiz::setQuestions(vector<Question> questionList)
 {
@@ -47,7 +54,15 @@ void Quiz::setDifficulty(string quizDifficulty)
     difficulty = quizDifficulty;
 }
 
-// Getters
+void Quiz::setTimeLimit(int seconds)
+{
+    if (seconds > 0)
+    {
+        timeLimit = seconds;
+    }
+}
+
+// ==================== GETTERS ====================
 
 vector<Question> Quiz::getQuestions() const
 {
@@ -79,7 +94,12 @@ int Quiz::getWrongAnswers() const
     return wrongAnswers;
 }
 
-// Start quiz
+int Quiz::getTimeLimit() const
+{
+    return timeLimit;
+}
+
+// ==================== START QUIZ ====================
 
 void Quiz::startQuiz()
 {
@@ -99,10 +119,31 @@ void Quiz::startQuiz()
     cout << "Category   : " << category << "\n";
     cout << "Difficulty : " << difficulty << "\n";
     cout << "Questions  : " << totalQuestions << "\n";
+    cout << "Time Limit : " << timeLimit / 60 << " seconds\n";
     cout << "========================================\n";
+
+    // Start timer
+    auto startTime = chrono::steady_clock::now();
 
     for (size_t i = 0; i < questions.size(); i++)
     {
+        // Check elapsed time before displaying the next question
+        auto currentTime = chrono::steady_clock::now();
+
+        auto elapsedSeconds =
+            chrono::duration_cast<chrono::seconds>(
+                currentTime - startTime
+            ).count();
+
+        if (elapsedSeconds >= timeLimit)
+        {
+            cout << "\n========================================\n";
+            cout << "             TIME IS UP!\n";
+            cout << "========================================\n";
+            cout << "The quiz time limit has been reached.\n";
+            break;
+        }
+
         cout << "\nQuestion " << i + 1
              << " of " << totalQuestions << "\n";
 
@@ -116,9 +157,9 @@ void Quiz::startQuiz()
         answer = toupper(answer);
 
         while (answer != 'A' &&
-        answer != 'B' &&
-        answer != 'C' &&
-        answer != 'D')
+               answer != 'B' &&
+               answer != 'C' &&
+               answer != 'D')
         {
             cout << "\nInvalid answer.\n";
             cout << "Please enter only A, B, C or D: ";
@@ -128,8 +169,8 @@ void Quiz::startQuiz()
 
             cin >> answer;
 
-        answer = toupper(answer);
-    }
+            answer = toupper(answer);
+        }
 
         if (questions[i].checkAnswer(answer))
         {
@@ -149,7 +190,7 @@ void Quiz::startQuiz()
     displayResult();
 }
 
-// Calculate percentage
+// ==================== CALCULATE PERCENTAGE ====================
 
 double Quiz::calculatePercentage() const
 {
@@ -162,7 +203,7 @@ double Quiz::calculatePercentage() const
             / totalQuestions) * 100.0;
 }
 
-// Display result
+// ==================== DISPLAY RESULT ====================
 
 void Quiz::displayResult() const
 {
