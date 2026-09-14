@@ -768,7 +768,8 @@ void studentDashboard(const User& user)
 
         cout << "1. Start Quiz\n";
         cout << "2. View Profile\n";
-        cout << "3. Logout\n";
+        cout << "3. View Quiz History\n";
+        cout << "4. Logout\n";
 
         cout << "\nEnter your choice: ";
 
@@ -786,22 +787,26 @@ void studentDashboard(const User& user)
         switch (choice)
         {
             case 1:
-                startStudentQuiz(user);
-                break;
+            startStudentQuiz(user);
+            break;
 
             case 2:
-                user.displayUser();
-                break;
+            user.displayUser();
+            break;
 
             case 3:
-                cout << "\nLogging out...\n";
-                break;
+            FileManager::viewQuizHistory(user.getUsername());
+            break;
+
+            case 4:
+            cout << "\nLogging out...\n";
+            break;
 
             default:
-                cout << "\nInvalid choice. Please enter a number between 1 and 3.\n";
+            cout << "\nInvalid choice. Please enter a number between 1 and 4.\n";
         }
 
-    } while (choice != 3);
+    } while (choice != 4);
 }
 
 bool loginAdmin()

@@ -30,6 +30,8 @@ public:
                        string result);
 
     static void viewQuizHistory(string username);
+    
+    static void viewPerformanceSummary(string username);
 
     // Check whether a username already exists
     static bool usernameExists(string username);

@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <iomanip>
 
 using namespace std;
 
@@ -278,9 +279,6 @@ void FileManager::viewQuizHistory(string username)
     cout << "             QUIZ HISTORY\n";
     cout << "========================================\n";
 
-    cout << "\nCategory\tDifficulty\tTotal\tCorrect\tWrong\tPercentage\tResult\n";
-    cout << "--------------------------------------------------------------------------------\n";
-
     while (getline(file, line))
     {
         if (line.empty())
@@ -312,13 +310,15 @@ void FileManager::viewQuizHistory(string username)
         {
             found = true;
 
-            cout << category << "\t\t"
-                 << difficulty << "\t\t"
-                 << totalQuestions << "\t"
-                 << correctAnswers << "\t"
-                 << wrongAnswers << "\t"
-                 << percentage << "%\t\t"
-                 << result << "\n";
+            cout << "\n----------------------------------------\n";
+            cout << "Category        : " << category << "\n";
+            cout << "Difficulty      : " << difficulty << "\n";
+            cout << "Total Questions : " << totalQuestions << "\n";
+            cout << "Correct Answers : " << correctAnswers << "\n";
+            cout << "Wrong Answers   : " << wrongAnswers << "\n";
+            cout << "Percentage      : " << percentage << "%\n";
+            cout << "Result          : " << result << "\n";
+            cout << "----------------------------------------\n";
         }
     }
 
@@ -328,6 +328,107 @@ void FileManager::viewQuizHistory(string username)
     {
         cout << "\nNo quiz attempts found.\n";
     }
+
+    cout << "\n========================================\n";
+}
+
+void FileManager::viewPerformanceSummary(string username)
+{
+    ifstream file(RESULT_FILE);
+
+    if (!file)
+    {
+        cout << "\nNo quiz results available.\n";
+        return;
+    }
+
+    string line;
+
+    int totalAttempts = 0;
+    int passedQuizzes = 0;
+    int failedQuizzes = 0;
+
+    double totalPercentage = 0.0;
+    double bestPercentage = 0.0;
+
+    while (getline(file, line))
+    {
+        if (line.empty())
+        {
+            continue;
+        }
+
+        string savedUsername;
+        string category;
+        string difficulty;
+        string totalQuestions;
+        string correctAnswers;
+        string wrongAnswers;
+        string percentage;
+        string result;
+
+        stringstream ss(line);
+
+        getline(ss, savedUsername, '|');
+        getline(ss, category, '|');
+        getline(ss, difficulty, '|');
+        getline(ss, totalQuestions, '|');
+        getline(ss, correctAnswers, '|');
+        getline(ss, wrongAnswers, '|');
+        getline(ss, percentage, '|');
+        getline(ss, result, '|');
+
+        if (savedUsername == username)
+        {
+            totalAttempts++;
+
+            double percentageValue = stod(percentage);
+
+            totalPercentage += percentageValue;
+
+            if (percentageValue > bestPercentage)
+            {
+                bestPercentage = percentageValue;
+            }
+
+            if (result == "PASSED")
+            {
+                passedQuizzes++;
+            }
+            else if (result == "FAILED")
+            {
+                failedQuizzes++;
+            }
+        }
+    }
+
+    file.close();
+
+    cout << "\n========================================\n";
+    cout << "        PERFORMANCE SUMMARY\n";
+    cout << "========================================\n";
+
+    if (totalAttempts == 0)
+    {
+        cout << "\nNo quiz attempts found.\n";
+        cout << "========================================\n";
+        return;
+    }
+
+    double averagePercentage =
+        totalPercentage / totalAttempts;
+
+    cout << "Total Attempts    : " << totalAttempts << "\n";
+    cout << "Passed Quizzes    : " << passedQuizzes << "\n";
+    cout << "Failed Quizzes    : " << failedQuizzes << "\n";
+
+    cout << fixed << setprecision(2);
+
+    cout << "Average Percentage: "
+         << averagePercentage << "%\n";
+
+    cout << "Best Percentage   : "
+         << bestPercentage << "%\n";
 
     cout << "========================================\n";
 }
