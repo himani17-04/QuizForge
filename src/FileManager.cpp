@@ -260,3 +260,74 @@ bool FileManager::usernameExists(string username)
 
     return false;
 }
+
+void FileManager::viewQuizHistory(string username)
+{
+    ifstream file(RESULT_FILE);
+
+    if (!file)
+    {
+        cout << "\nNo quiz history available.\n";
+        return;
+    }
+
+    string line;
+    bool found = false;
+
+    cout << "\n========================================\n";
+    cout << "             QUIZ HISTORY\n";
+    cout << "========================================\n";
+
+    cout << "\nCategory\tDifficulty\tTotal\tCorrect\tWrong\tPercentage\tResult\n";
+    cout << "--------------------------------------------------------------------------------\n";
+
+    while (getline(file, line))
+    {
+        if (line.empty())
+        {
+            continue;
+        }
+
+        string savedUsername;
+        string category;
+        string difficulty;
+        string totalQuestions;
+        string correctAnswers;
+        string wrongAnswers;
+        string percentage;
+        string result;
+
+        stringstream ss(line);
+
+        getline(ss, savedUsername, '|');
+        getline(ss, category, '|');
+        getline(ss, difficulty, '|');
+        getline(ss, totalQuestions, '|');
+        getline(ss, correctAnswers, '|');
+        getline(ss, wrongAnswers, '|');
+        getline(ss, percentage, '|');
+        getline(ss, result, '|');
+
+        if (savedUsername == username)
+        {
+            found = true;
+
+            cout << category << "\t\t"
+                 << difficulty << "\t\t"
+                 << totalQuestions << "\t"
+                 << correctAnswers << "\t"
+                 << wrongAnswers << "\t"
+                 << percentage << "%\t\t"
+                 << result << "\n";
+        }
+    }
+
+    file.close();
+
+    if (!found)
+    {
+        cout << "\nNo quiz attempts found.\n";
+    }
+
+    cout << "========================================\n";
+}

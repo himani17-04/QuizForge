@@ -29,6 +29,8 @@ public:
                        double percentage,
                        string result);
 
+    static void viewQuizHistory(string username);
+
     // Check whether a username already exists
     static bool usernameExists(string username);
 };
