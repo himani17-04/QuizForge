@@ -274,6 +274,7 @@ void FileManager::viewQuizHistory(string username)
 
     string line;
     bool found = false;
+    int attemptNumber = 0;
 
     cout << "\n========================================\n";
     cout << "             QUIZ HISTORY\n";
@@ -309,8 +310,10 @@ void FileManager::viewQuizHistory(string username)
         if (savedUsername == username)
         {
             found = true;
+            attemptNumber++;
 
-            cout << "\n----------------------------------------\n";
+            cout << "\nAttempt #" << attemptNumber << "\n";
+            cout << "----------------------------------------\n";
             cout << "Category        : " << category << "\n";
             cout << "Difficulty      : " << difficulty << "\n";
             cout << "Total Questions : " << totalQuestions << "\n";

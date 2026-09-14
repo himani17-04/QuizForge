@@ -761,19 +761,15 @@ void studentDashboard(const User& user)
         cout << "\n========================================\n";
         cout << "          STUDENT DASHBOARD\n";
         cout << "========================================\n";
-
-        cout << "Welcome, "
-             << user.getFullName()
-             << "!\n\n";
-
         cout << "1. Start Quiz\n";
         cout << "2. View Profile\n";
         cout << "3. View Quiz History\n";
-        cout << "4. Logout\n";
+        cout << "4. View Performance Summary\n";
+        cout << "5. Logout\n";
+        cout << "========================================\n";
 
-        cout << "\nEnter your choice: ";
+        cout << "Enter your choice: ";
 
-        // Validate menu input
         while (!(cin >> choice))
         {
             cout << "\nInvalid input. Please enter a number.\n";
@@ -787,26 +783,30 @@ void studentDashboard(const User& user)
         switch (choice)
         {
             case 1:
-            startStudentQuiz(user);
-            break;
+                startStudentQuiz(user);
+                break;
 
             case 2:
-            user.displayUser();
-            break;
+                user.displayUser();
+                break;
 
             case 3:
-            FileManager::viewQuizHistory(user.getUsername());
-            break;
+                FileManager::viewQuizHistory(user.getUsername());
+                break;
 
             case 4:
-            cout << "\nLogging out...\n";
-            break;
+                FileManager::viewPerformanceSummary(user.getUsername());
+                break;
+
+            case 5:
+                cout << "\nLogging out...\n";
+                break;
 
             default:
-            cout << "\nInvalid choice. Please enter a number between 1 and 4.\n";
+                cout << "\nInvalid choice. Please enter a number between 1 and 5.\n";
         }
 
-    } while (choice != 4);
+    } while (choice != 5);
 }
 
 bool loginAdmin()
