@@ -42,6 +42,7 @@ public:
 
     // Display question
     void displayQuestion() const;
+    void displayQuestion(int questionNumber) const;
 
     // Check answer
     bool checkAnswer(char answer) const;

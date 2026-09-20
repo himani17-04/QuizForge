@@ -134,7 +134,7 @@ void Quiz::startQuiz()
         cout << "\nQuestion " << i + 1
              << " of " << totalQuestions << "\n";
 
-        questions[i].displayQuestion();
+        questions[i].displayQuestion(i + 1);
 
         // Remove any leftover keyboard input
         while (_kbhit())

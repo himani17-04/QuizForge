@@ -95,12 +95,31 @@ string Question::getDifficulty() const
 void Question::displayQuestion() const
 {
     cout << "\n----------------------------------------\n";
-    cout << "Question " << questionId << ": " << questionText << "\n";
+    cout << "Question " << questionId << ": "
+         << questionText << "\n";
     cout << "----------------------------------------\n";
 
-    for (size_t i = 0; i < options.size(); i++)
+    for (int i = 0; i < options.size(); i++)
     {
-        cout << char('A' + i) << ". " << options[i] << "\n";
+        cout << char('A' + i) << ". "
+             << options[i] << "\n";
+    }
+
+    cout << "\nCategory   : " << category << "\n";
+    cout << "Difficulty : " << difficulty << "\n";
+}
+
+void Question::displayQuestion(int questionNumber) const
+{
+    cout << "\n----------------------------------------\n";
+    cout << "Question " << questionNumber << ": "
+         << questionText << "\n";
+    cout << "----------------------------------------\n";
+
+    for (int i = 0; i < options.size(); i++)
+    {
+        cout << char('A' + i) << ". "
+             << options[i] << "\n";
     }
 
     cout << "\nCategory   : " << category << "\n";
