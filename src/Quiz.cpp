@@ -3,6 +3,8 @@
 #include <iomanip>
 #include <cctype>
 #include <chrono>
+#include <windows.h>
+#include <conio.h>
 
 using namespace std;
 
@@ -119,59 +121,91 @@ void Quiz::startQuiz()
     cout << "Category   : " << category << "\n";
     cout << "Difficulty : " << difficulty << "\n";
     cout << "Questions  : " << totalQuestions << "\n";
-    cout << "Time Limit : " << timeLimit / 60 << " seconds\n";
+    cout << "Time Limit : " << timeLimit << " seconds\n";
     cout << "========================================\n";
 
-    // Start timer
+    // Start the complete quiz timer
     auto startTime = chrono::steady_clock::now();
+
+    bool timeUp = false;
 
     for (size_t i = 0; i < questions.size(); i++)
     {
-        // Check elapsed time before displaying the next question
-        auto currentTime = chrono::steady_clock::now();
+        cout << "\nQuestion " << i + 1
+             << " of " << totalQuestions << "\n";
 
-        auto elapsedSeconds =
-            chrono::duration_cast<chrono::seconds>(
-                currentTime - startTime
-            ).count();
+        questions[i].displayQuestion();
 
-        if (elapsedSeconds >= timeLimit)
+        // Remove any leftover keyboard input
+        while (_kbhit())
         {
-            cout << "\n========================================\n";
+            _getch();
+        }
+
+        char answer = '\0';
+
+        cout << "\nEnter your answer (A/B/C/D): ";
+
+        // Wait for answer while checking timer
+        while (true)
+        {
+            auto currentTime = chrono::steady_clock::now();
+
+            auto elapsedSeconds =
+                chrono::duration_cast<chrono::seconds>(
+                    currentTime - startTime
+                ).count();
+
+            int remainingSeconds =
+                timeLimit - static_cast<int>(elapsedSeconds);
+
+            // Time is over
+            if (remainingSeconds <= 0)
+            {
+                timeUp = true;
+                break;
+            }
+
+            // Display remaining time
+            cout << "\rTime Remaining: "
+                 << remainingSeconds
+                 << " seconds   " << flush;
+
+            // Check keyboard input
+            if (_kbhit())
+            {
+                answer = _getch();
+
+                answer = toupper(answer);
+
+                // Accept only A, B, C or D
+                if (answer == 'A' ||
+                    answer == 'B' ||
+                    answer == 'C' ||
+                    answer == 'D')
+                {
+                    cout << "\n";
+                    break;
+                }
+
+                cout << "\nInvalid answer.";
+                cout << "\nPlease enter only A, B, C or D: ";
+            }
+
+            Sleep(100);
+        }
+
+        // If time is over
+        if (timeUp)
+        {
+            cout << "\n\n========================================\n";
             cout << "             TIME IS UP!\n";
             cout << "========================================\n";
             cout << "The quiz time limit has been reached.\n";
             break;
         }
 
-        cout << "\nQuestion " << i + 1
-             << " of " << totalQuestions << "\n";
-
-        questions[i].displayQuestion();
-
-        char answer;
-
-        cout << "\nEnter your answer (A/B/C/D): ";
-        cin >> answer;
-
-        answer = toupper(answer);
-
-        while (answer != 'A' &&
-               answer != 'B' &&
-               answer != 'C' &&
-               answer != 'D')
-        {
-            cout << "\nInvalid answer.\n";
-            cout << "Please enter only A, B, C or D: ";
-
-            cin.clear();
-            cin.ignore(10000, '\n');
-
-            cin >> answer;
-
-            answer = toupper(answer);
-        }
-
+        // Check answer
         if (questions[i].checkAnswer(answer))
         {
             cout << "Correct!\n";
@@ -181,7 +215,8 @@ void Quiz::startQuiz()
         {
             cout << "Wrong answer.\n";
             cout << "Correct answer: "
-                 << questions[i].getCorrectAnswer() << "\n";
+                 << questions[i].getCorrectAnswer()
+                 << "\n";
 
             wrongAnswers++;
         }
@@ -220,7 +255,9 @@ void Quiz::displayResult() const
     cout << "Wrong Answers   : " << wrongAnswers << "\n";
 
     cout << fixed << setprecision(2);
-    cout << "Percentage      : " << percentage << "%\n";
+
+    cout << "Percentage      : "
+         << percentage << "%\n";
 
     if (percentage >= 40)
     {
