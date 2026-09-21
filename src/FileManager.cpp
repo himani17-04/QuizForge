@@ -554,3 +554,128 @@ void FileManager::viewLeaderboard()
 
     cout << "========================================\n";
 }
+
+void FileManager::viewAllStudentPerformance()
+{
+    ifstream file(RESULT_FILE);
+
+    if (!file)
+    {
+        cout << "\nNo quiz results available.\n";
+        return;
+    }
+
+    struct StudentPerformance
+    {
+        string username;
+        int attempts;
+        int passed;
+        int failed;
+        double totalPercentage;
+        double bestPercentage;
+    };
+
+    vector<StudentPerformance> students;
+
+    string line;
+
+    while (getline(file, line))
+    {
+        if (line.empty())
+        {
+            continue;
+        }
+
+        string username;
+        string category;
+        string difficulty;
+        string totalQuestions;
+        string correctAnswers;
+        string wrongAnswers;
+        string percentage;
+        string result;
+
+        stringstream ss(line);
+
+        getline(ss, username, '|');
+        getline(ss, category, '|');
+        getline(ss, difficulty, '|');
+        getline(ss, totalQuestions, '|');
+        getline(ss, correctAnswers, '|');
+        getline(ss, wrongAnswers, '|');
+        getline(ss, percentage, '|');
+        getline(ss, result, '|');
+
+        double percentageValue = stod(percentage);
+
+        bool found = false;
+
+        for (auto& student : students)
+        {
+            if (student.username == username)
+            {
+                student.attempts++;
+                student.totalPercentage += percentageValue;
+
+                if (percentageValue > student.bestPercentage)
+                {
+                    student.bestPercentage = percentageValue;
+                }
+
+                if (result == "PASSED")
+                    student.passed++;
+                else
+                    student.failed++;
+
+                found = true;
+                break;
+            }
+        }
+
+        if (!found)
+        {
+            StudentPerformance student;
+
+            student.username = username;
+            student.attempts = 1;
+            student.passed = (result == "PASSED") ? 1 : 0;
+            student.failed = (result == "FAILED") ? 1 : 0;
+            student.totalPercentage = percentageValue;
+            student.bestPercentage = percentageValue;
+
+            students.push_back(student);
+        }
+    }
+
+    file.close();
+
+    cout << "\n========================================\n";
+    cout << "       ALL STUDENT PERFORMANCE\n";
+    cout << "========================================\n";
+
+    if (students.empty())
+    {
+        cout << "\nNo student performance data available.\n";
+        cout << "========================================\n";
+        return;
+    }
+
+    cout << "\nUsername\tAttempts\tPassed\tFailed\tAverage\tBest\n";
+    cout << "------------------------------------------------------------\n";
+
+    for (const auto& student : students)
+    {
+        double average =
+            student.totalPercentage / student.attempts;
+
+        cout << student.username << "\t\t"
+             << student.attempts << "\t\t"
+             << student.passed << "\t"
+             << student.failed << "\t"
+             << fixed << setprecision(2)
+             << average << "%\t"
+             << student.bestPercentage << "%\n";
+    }
+
+    cout << "========================================\n";
+}

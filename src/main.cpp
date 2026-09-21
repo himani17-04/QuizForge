@@ -982,7 +982,8 @@ void adminDashboard()
         cout << "3. Update Question\n";
         cout << "4. Delete Question\n";
         cout << "5. View Student Results\n";
-        cout << "6. Logout\n";
+        cout << "6. View Student Performance\n";
+        cout << "7. Logout\n";
 
         cout << "\nEnter your choice: ";
 
@@ -1117,14 +1118,18 @@ void adminDashboard()
             }
 
             case 6:
-                cout << "\nLogging out from admin account...\n";
+                FileManager::viewAllStudentPerformance();
+                break;
+
+            case 7:
+                cout << "\nLogging out...\n";
                 break;
 
             default:
                 cout << "\nInvalid choice. Please try again.\n";
         }
 
-    } while (choice != 6);
+    } while (choice != 7);
 }
 
 int main()
