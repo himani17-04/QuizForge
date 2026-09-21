@@ -33,7 +33,8 @@ public:
     
     static void viewPerformanceSummary(string username);
 
-    // Check whether a username already exists
+    static void viewLeaderboard();
+
     static bool usernameExists(string username);
 };
 
