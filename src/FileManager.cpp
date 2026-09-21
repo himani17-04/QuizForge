@@ -3,6 +3,8 @@
 #include <fstream>
 #include <sstream>
 #include <iomanip>
+#include <vector>
+#include <algorithm>
 
 using namespace std;
 
@@ -432,6 +434,123 @@ void FileManager::viewPerformanceSummary(string username)
 
     cout << "Best Percentage   : "
          << bestPercentage << "%\n";
+
+    cout << "========================================\n";
+}
+
+void FileManager::viewLeaderboard()
+{
+    ifstream file(RESULT_FILE);
+
+    if (!file)
+    {
+        cout << "\nNo quiz results available.\n";
+        return;
+    }
+
+    struct StudentScore
+    {
+        string username;
+        double bestPercentage;
+    };
+
+    vector<StudentScore> leaderboard;
+
+    string line;
+
+    while (getline(file, line))
+    {
+        if (line.empty())
+        {
+            continue;
+        }
+
+        string username;
+        string category;
+        string difficulty;
+        string totalQuestions;
+        string correctAnswers;
+        string wrongAnswers;
+        string percentage;
+        string result;
+
+        stringstream ss(line);
+
+        getline(ss, username, '|');
+        getline(ss, category, '|');
+        getline(ss, difficulty, '|');
+        getline(ss, totalQuestions, '|');
+        getline(ss, correctAnswers, '|');
+        getline(ss, wrongAnswers, '|');
+        getline(ss, percentage, '|');
+        getline(ss, result, '|');
+
+        double percentageValue = stod(percentage);
+
+        bool found = false;
+
+        for (auto& student : leaderboard)
+        {
+            if (student.username == username)
+            {
+                found = true;
+
+                if (percentageValue > student.bestPercentage)
+                {
+                    student.bestPercentage = percentageValue;
+                }
+
+                break;
+            }
+        }
+
+        if (!found)
+        {
+            StudentScore student;
+
+            student.username = username;
+            student.bestPercentage = percentageValue;
+
+            leaderboard.push_back(student);
+        }
+    }
+
+    file.close();
+
+    sort(
+        leaderboard.begin(),
+        leaderboard.end(),
+        [](const StudentScore& a, const StudentScore& b)
+        {
+            return a.bestPercentage > b.bestPercentage;
+        }
+    );
+
+    cout << "\n========================================\n";
+    cout << "              LEADERBOARD\n";
+    cout << "========================================\n";
+
+    if (leaderboard.empty())
+    {
+        cout << "\nNo quiz results available.\n";
+        cout << "========================================\n";
+        return;
+    }
+
+    cout << "\nRank\tUsername\tBest Score\n";
+    cout << "----------------------------------------\n";
+
+    int rank = 1;
+
+    for (const auto& student : leaderboard)
+    {
+        cout << rank << "\t"
+             << student.username << "\t\t"
+             << fixed << setprecision(2)
+             << student.bestPercentage << "%\n";
+
+        rank++;
+    }
 
     cout << "========================================\n";
 }
