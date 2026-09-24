@@ -37,6 +37,8 @@ public:
 
     static void viewAllStudentPerformance();
 
+    static void viewStudentResults(string username);
+
     static bool usernameExists(string username);
 };
 
