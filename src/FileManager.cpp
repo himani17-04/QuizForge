@@ -679,3 +679,74 @@ void FileManager::viewAllStudentPerformance()
 
     cout << "========================================\n";
 }
+
+void FileManager::viewStudentResults(string username)
+{
+    ifstream file(RESULT_FILE);
+
+    if (!file)
+    {
+        cout << "\nNo quiz results available.\n";
+        return;
+    }
+
+    string line;
+    bool found = false;
+
+    cout << "\n========================================\n";
+    cout << "        STUDENT QUIZ RESULTS\n";
+    cout << "========================================\n";
+    cout << "Student: " << username << "\n";
+    cout << "========================================\n";
+
+    while (getline(file, line))
+    {
+        if (line.empty())
+        {
+            continue;
+        }
+
+        string resultUsername;
+        string category;
+        string difficulty;
+        string totalQuestions;
+        string correctAnswers;
+        string wrongAnswers;
+        string percentage;
+        string result;
+
+        stringstream ss(line);
+
+        getline(ss, resultUsername, '|');
+        getline(ss, category, '|');
+        getline(ss, difficulty, '|');
+        getline(ss, totalQuestions, '|');
+        getline(ss, correctAnswers, '|');
+        getline(ss, wrongAnswers, '|');
+        getline(ss, percentage, '|');
+        getline(ss, result, '|');
+
+        if (resultUsername == username)
+        {
+            found = true;
+
+            cout << "\nCategory   : " << category << "\n";
+            cout << "Difficulty : " << difficulty << "\n";
+            cout << "Questions  : " << totalQuestions << "\n";
+            cout << "Correct    : " << correctAnswers << "\n";
+            cout << "Wrong      : " << wrongAnswers << "\n";
+            cout << "Percentage : " << percentage << "%\n";
+            cout << "Result     : " << result << "\n";
+            cout << "----------------------------------------\n";
+        }
+    }
+
+    file.close();
+
+    if (!found)
+    {
+        cout << "\nNo results found for this student.\n";
+    }
+
+    cout << "========================================\n";
+}
