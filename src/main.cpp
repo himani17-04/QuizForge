@@ -983,7 +983,8 @@ void adminDashboard()
         cout << "4. Delete Question\n";
         cout << "5. View Student Results\n";
         cout << "6. View Student Performance\n";
-        cout << "7. Logout\n";
+        cout << "7. Search Student Results\n";
+        cout << "8. Logout\n";
 
         cout << "\nEnter your choice: ";
 
@@ -1122,6 +1123,17 @@ void adminDashboard()
                 break;
 
             case 7:
+            {
+                string username;
+
+                cout << "\nEnter student username: ";
+                cin >> username;
+
+                FileManager::viewStudentResults(username);
+                break;
+            }
+
+            case 8:
                 cout << "\nLogging out...\n";
                 break;
 
@@ -1129,7 +1141,7 @@ void adminDashboard()
                 cout << "\nInvalid choice. Please try again.\n";
         }
 
-    } while (choice != 7);
+    } while (choice != 8);
 }
 
 int main()
