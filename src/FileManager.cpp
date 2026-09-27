@@ -750,3 +750,34 @@ void FileManager::viewStudentResults(string username)
 
     cout << "========================================\n";
 }
+
+void FileManager::searchQuestions(string category, string difficulty)
+{
+    vector<Question> questions = loadQuestions();
+
+    bool found = false;
+
+    cout << "\n========================================\n";
+    cout << "          SEARCH QUESTIONS\n";
+    cout << "========================================\n";
+    cout << "Category   : " << category << "\n";
+    cout << "Difficulty : " << difficulty << "\n";
+    cout << "========================================\n";
+
+    for (const Question& question : questions)
+    {
+        if (question.getCategory() == category &&
+            question.getDifficulty() == difficulty)
+        {
+            question.displayQuestion();
+            found = true;
+        }
+    }
+
+    if (!found)
+    {
+        cout << "\nNo questions found matching the criteria.\n";
+    }
+
+    cout << "\n========================================\n";
+}

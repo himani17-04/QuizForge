@@ -39,6 +39,8 @@ public:
 
     static void viewStudentResults(string username);
 
+    static void searchQuestions(string category, string difficulty);
+
     static bool usernameExists(string username);
 };
 
