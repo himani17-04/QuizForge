@@ -765,7 +765,9 @@ void studentDashboard(const User& user)
         cout << "2. View Profile\n";
         cout << "3. View Quiz History\n";
         cout << "4. View Performance Summary\n";
-        cout << "5. Logout\n";
+        cout << "5. View Leaderboard\n";
+        cout << "6. Change Password\n";
+        cout << "7. Logout\n";
         cout << "========================================\n";
 
         cout << "Enter your choice: ";
@@ -799,14 +801,44 @@ void studentDashboard(const User& user)
                 break;
 
             case 5:
+                FileManager::viewLeaderboard();
+                break;
+
+            case 6:
+            {
+                string currentPassword;
+                string newPassword;
+
+                cout << "\nEnter current password: ";
+                cin >> currentPassword;
+
+                cout << "Enter new password: ";
+                cin >> newPassword;
+
+                if (FileManager::changePassword(
+                        user.getUsername(),
+                        currentPassword,
+                        newPassword))
+                {
+                    cout << "\nPassword changed successfully.\n";
+                }
+                else
+                {
+                    cout << "\nIncorrect current password or password could not be changed.\n";
+                }
+
+                break;
+            }
+
+            case 7:
                 cout << "\nLogging out...\n";
                 break;
 
             default:
-                cout << "\nInvalid choice. Please enter a number between 1 and 5.\n";
+                cout << "\nInvalid choice. Please enter a number between 1 and 7.\n";
         }
 
-    } while (choice != 5);
+    } while (choice != 7);
 }
 
 bool loginAdmin()

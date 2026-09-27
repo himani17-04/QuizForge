@@ -781,3 +781,52 @@ void FileManager::searchQuestions(string category, string difficulty)
 
     cout << "\n========================================\n";
 }
+
+bool FileManager::changePassword(
+    string username,
+    string currentPassword,
+    string newPassword)
+{
+    vector<User> users = loadUsers();
+
+    bool found = false;
+
+    for (User& user : users)
+    {
+        if (user.getUsername() == username)
+        {
+            found = true;
+
+            if (user.getPassword() != currentPassword)
+            {
+                return false;
+            }
+
+            user.setPassword(newPassword);
+            break;
+        }
+    }
+
+    if (!found)
+    {
+        return false;
+    }
+
+    ofstream file(USER_FILE);
+
+    if (!file)
+    {
+        return false;
+    }
+
+    for (const User& user : users)
+    {
+        file << user.getUsername() << "|"
+             << user.getPassword() << "|"
+             << user.getFullName() << "\n";
+    }
+
+    file.close();
+
+    return true;
+}
