@@ -41,6 +41,8 @@ public:
 
     static void searchQuestions(string category, string difficulty);
 
+    static bool changePassword(string username, string currentPassword, string newPassword);
+
     static bool usernameExists(string username);
 };
 
